@@ -1,0 +1,42 @@
+services:
+  db:
+    image: mysql:latest
+    ports:
+      - "50001:3306"
+    networks:
+      - traefik
+    volumes:
+      - stig-manager-api-db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpw
+      - MYSQL_USER=stigman
+      - MYSQL_PASSWORD=stigman
+      - MYSQL_DATABASE=stigman
+    cap_add:
+      - SYS_NICE  # workaround MySQL logging bug => mbind: Operation not permitted 
+  api:
+    image: nuwcdivnpt/stig-manager:latest
+    networks:
+      - traefik
+    environment:
+      - STIGMAN_OIDC_PROVIDER=http://keycloak.local.guatalupe.com/realms/stigman
+      - STIGMAN_CLASSIFICATION=CUI
+      - STIGMAN_DEV_ALLOW_INSECURE_TOKENS=true
+      - STIGMAN_DB_HOST=db
+      - STIGMAN_DB_PASSWORD=stigman
+      - STIGMAN_CLIENT_OIDC_PROVIDER=https://keycloak.local.guatalupe.com/realms/stigman
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.stigman.rule=Host(`stigman.local.guatalupe.com`)"
+      - "traefik.http.routers.stigman.entrypoints=https"
+      - "traefik.http.routers.stigman.tls=true"
+      - "traefik.http.services.stigman.loadbalancer.server.port=54000"
+    init: true
+    
+networks:
+  traefik:
+    external: true
+
+volumes:
+  stig-manager-api-db:
+    external: true
