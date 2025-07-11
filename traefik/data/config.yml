@@ -1,52 +1,5 @@
 http:
- #region routers 
   routers:
-    pihole:
-      entryPoints:
-        - "https"
-      rule: "Host(`pihole.local.guatalupe.com`)"
-      middlewares:
-        - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: pihole
-    plex:
-      entryPoints:
-        - "https"
-      rule: "Host(`plex.local.guatalupe.com`)"
-      middlewares:
-        - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: plex
-    esxi:
-      entryPoints:
-        - "https"
-      rule: "Host(`esxi.local.guatalupe.com`)"
-      middlewares:
-        - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: esxi
-#endregion
-#region services
-  services:
-    pihole:
-      loadBalancer:
-        servers:
-          - url: "https://192.168.1.160"
-        passHostHeader: true
-    esxi:
-      loadBalancer:
-        servers:
-          - url: "https://192.168.1.19"
-        passHostheader: true
-    plex:
-      loadBalancer:
-        servers:
-          - url: "https://192.168.1.150:32400"
-        passHostHeader: true
-#endregion
   middlewares:
     https-redirectscheme:
       redirectScheme:
